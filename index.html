@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/styles/style.min.css">
+</head>
+<body>
+
+
+    <div id="auth-code-container">
+        <h1>OAuth Parameters</h1>
+        <div id="params-container"></div>
+    </div>
+
+    <script>
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1500);
+            });
+        }
+
+        // Parse all query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramsContainer = document.getElementById('params-container');
+
+        if (urlParams.toString() === '') {
+            paramsContainer.innerHTML = '<p class="no-params">No parameters found. Waiting for OAuth callback...</p>';
+        } else {
+            urlParams.forEach((value, key) => {
+                const paramDiv = document.createElement('div');
+                paramDiv.className = 'param-item';
+
+                const label = document.createElement('label');
+                label.textContent = key;
+
+                const fieldWrapper = document.createElement('div');
+                fieldWrapper.className = 'field-wrapper';
+
+                const textarea = document.createElement('textarea');
+                textarea.value = value;
+                textarea.readOnly = true;
+                textarea.id = `param-${key}`;
+                textarea.rows = 1;
+
+                // Auto-resize textarea to fit content
+                setTimeout(() => {
+                    textarea.style.height = '0px';
+                    const newHeight = textarea.scrollHeight;
+                    textarea.style.height = newHeight + 'px';
+                }, 0);
+
+                const button = document.createElement('button');
+                button.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                button.onclick = () => copyToClipboard(value, button);
+
+                fieldWrapper.appendChild(textarea);
+                fieldWrapper.appendChild(button);
+
+                paramDiv.appendChild(label);
+                paramDiv.appendChild(fieldWrapper);
+
+                paramsContainer.appendChild(paramDiv);
+            });
+        }
+    </script>
+
+
+</body>
+</html>

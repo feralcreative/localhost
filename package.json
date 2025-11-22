@@ -1,0 +1,24 @@
+{
+  "name": "localhost-auth-callback",
+  "version": "1.0.0",
+  "description": "Local server for OAuth callback handling",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "concurrently \"node server.js\" \"browser-sync start --proxy 'localhost:31875' --port 1975 --files '**/*.html, **/*.css, **/*.js' --no-open\""
+  },
+  "keywords": [
+    "oauth",
+    "callback",
+    "localhost"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.2",
+    "concurrently": "^8.2.2"
+  }
+}
