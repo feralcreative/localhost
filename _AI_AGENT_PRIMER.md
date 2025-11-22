@@ -34,12 +34,12 @@ npm install
 npm run dev
 
 # 4. Access the application
-# - Direct Express: http://localhost:31875
-# - BrowserSync (dev): http://localhost:1975
+# - Direct Express: http://localhost:3000
+# - BrowserSync (dev): http://localhost:3001
 
 # 5. Use as OAuth callback URL
 # Register this URL with your OAuth provider:
-# http://localhost:31875
+# http://localhost:3000
 ```
 
 **That's it!** The server will capture any query parameters sent to it.
@@ -53,7 +53,7 @@ npm run dev
 ```text
 /Users/ziad/www/localhost/
 ├── index.html              # Main OAuth callback page
-├── server.js               # Express server (PORT 31875)
+├── server.js               # Express server (PORT 3000)
 ├── package.json            # Dependencies and scripts
 ├── package-lock.json       # Locked dependency versions
 ├── README.md               # Project documentation
@@ -72,7 +72,7 @@ npm run dev
 
 **PRIMARY (Active):**
 
-- `server.js` → Express server on port 31875
+- `server.js` → Express server on port 3000
 - `index.html` → OAuth callback page served at root `/`
 - `README.md` → User-facing documentation
 - `_AI_AGENT_PRIMER.md` → Comprehensive developer guide
@@ -85,7 +85,7 @@ npm run dev
 
 - **Node.js** (version: system default)
 - **Express.js** `^4.18.2` - Minimal web server
-- **Port:** `31875` (Express), `1975` (BrowserSync)
+- **Port:** `3000` (Express), `3001` (BrowserSync)
 
 ### Development Tools
 
@@ -116,15 +116,15 @@ npm run dev
 
 **What this does:**
 
-1. Starts Express server on `http://localhost:31875`
-2. Starts BrowserSync proxy on `http://localhost:1975`
+1. Starts Express server on `http://localhost:3000`
+2. Starts BrowserSync proxy on `http://localhost:3001`
 3. Watches for file changes (HTML, CSS, JS)
 4. Auto-reloads browser on changes
 
 **Access URLs:**
 
-- Development (with live reload): `http://localhost:1975`
-- Direct server: `http://localhost:31875`
+- Development (with live reload): `http://localhost:3001`
+- Direct server: `http://localhost:3000`
 
 ### Production Mode
 
@@ -134,7 +134,7 @@ npm start
 
 **What this does:**
 
-1. Starts Express server only on `http://localhost:31875`
+1. Starts Express server only on `http://localhost:3000`
 2. No live reload
 3. Lighter weight
 
@@ -142,12 +142,12 @@ npm start
 
 **Why these ports?**
 
-- `31875` - Unique port in dynamic range, unlikely to conflict
-- `1975` - BrowserSync port, easy to remember
+- `3000` - Standard OAuth development port (most common)
+- `3001` - BrowserSync port (standard convention: main port + 1)
 
 **To change ports:**
 
-1. Edit `server.js` line 5: `const PORT = 31875;`
+1. Edit `server.js` line 5: `const PORT = 3000;`
 2. Edit `package.json` line 8: Update proxy and port in dev script
 
 ---
@@ -160,7 +160,7 @@ OAuth Provider
     | Redirect with query params
     | Example: ?code=abc123&state=xyz
     ↓
-http://localhost:31875
+http://localhost:3000
     ↓
 Express Server (server.js)
     ↓
@@ -178,7 +178,7 @@ User sees parameters + copy buttons
 1. **OAuth Provider Redirect:**
 
    ```text
-   http://localhost:31875?code=AUTH_CODE&state=STATE_TOKEN&...
+   http://localhost:3000?code=AUTH_CODE&state=STATE_TOKEN&...
    ```
 
 2. **Express Route Handler** (`server.js` lines 11-13):
@@ -207,7 +207,7 @@ User sees parameters + copy buttons
 
 **Critical sections:**
 
-- **Line 5:** Port configuration `const PORT = 31875;`
+- **Line 5:** Port configuration `const PORT = 3000;`
 - **Line 8:** Static file serving `app.use(express.static(__dirname));`
 - **Lines 11-13:** Root route handler
 - **Lines 15-18:** Server startup with console logging
@@ -219,7 +219,7 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-const PORT = 31875;
+const PORT = 3000;
 
 // Serve static files from the root directory
 app.use(express.static(__dirname));
@@ -419,7 +419,7 @@ urlParams.forEach((value, key) => {
 
 1. Your app redirects user to OAuth provider
 2. User authorizes
-3. Provider redirects to `http://localhost:31875?code=...`
+3. Provider redirects to `http://localhost:3000?code=...`
 4. This server displays the code
 5. You copy the code and use it in your app
 
@@ -474,7 +474,7 @@ npm install
 npm run dev
 
 # 4. Open browser
-# http://localhost:1975
+# http://localhost:3001
 
 # 5. Edit files
 # - HTML: index.html
@@ -490,18 +490,18 @@ npm run dev
 
 1. **No parameters:**
 
-   - Visit `http://localhost:1975`
+   - Visit `http://localhost:3001`
    - Should show "No parameters found. Waiting for OAuth callback..."
 
 2. **Single parameter:**
 
-   - Visit `http://localhost:1975?code=test123`
+   - Visit `http://localhost:3001?code=test123`
    - Should show one textarea with "test123"
    - Copy button should work
 
 3. **Multiple parameters:**
 
-   - Visit `http://localhost:1975?code=abc&state=xyz&error=none`
+   - Visit `http://localhost:3001?code=abc&state=xyz&error=none`
    - Should show three textareas
    - Each should have its own copy button
 
@@ -530,15 +530,15 @@ npm run dev
 npm run dev
 
 # Look for:
-# 🚀 Server running on http://localhost:31875
-# 📋 OAuth Callback URL: http://localhost:31875
+# 🚀 Server running on http://localhost:3000
+# 📋 OAuth Callback URL: http://localhost:3000
 ```
 
 **Common issues:**
 
 1. **Port already in use:**
 
-   - Kill existing process: `lsof -ti:31875 | xargs kill -9`
+   - Kill existing process: `lsof -ti:3000 | xargs kill -9`
    - Or change port in `server.js`
 
 2. **CSS not updating:**
@@ -603,24 +603,27 @@ npm install
 - Better ecosystem for modern web development
 - Easier to add features later (WebSockets, etc.)
 
-### Why port 31875?
+### Why port 3000?
 
-**Decision:** Use port 31875 for Express server
+**Decision:** Use port 3000 for Express server
 
 **Alternatives considered:**
 
-- Common ports: 3000, 8000, 8080
-- Random high port
+- Port 8080 (traditional alternative)
+- Port 8000 (Python default)
+- Port 31875 (previous unique port)
 
 **Rationale:**
 
-- Unique port unlikely to conflict with other dev servers
-- In dynamic/private port range (49152-65535 typical, but 1024+ works)
-- Easy to remember (31875 = 3 + 1 + 8 + 7 + 5 = 24)
+- Most common OAuth development port
+- Default for React, Next.js, Express examples
+- Familiar to developers
+- Matches common tutorials and documentation
+- Easy to remember
 
 ### Why callback at root instead of /callback?
 
-**Decision:** Serve callback page at `http://localhost:31875/` (root)
+**Decision:** Serve callback page at `http://localhost:3000/` (root)
 
 **Alternatives considered:**
 
@@ -775,22 +778,22 @@ npm install
 
 ### Common Problems and Solutions
 
-#### Problem: "Port 31875 already in use"
+#### Problem: "Port 3000 already in use"
 
 **Symptoms:**
 
 ```text
-Error: listen EADDRINUSE: address already in use :::31875
+Error: listen EADDRINUSE: address already in use :::3000
 ```
 
 **Solutions:**
 
 ```bash
 # Option 1: Kill the process using the port
-lsof -ti:31875 | xargs kill -9
+lsof -ti:3000 | xargs kill -9
 
 # Option 2: Find and kill manually
-lsof -i:31875
+lsof -i:3000
 kill -9 <PID>
 
 # Option 3: Change the port
@@ -837,10 +840,10 @@ kill -9 <PID>
 
 **Solutions:**
 
-1. Check URL format: `http://localhost:31875?code=abc` (not `http://localhost:31875/?code=abc`)
+1. Check URL format: `http://localhost:3000?code=abc` (not `http://localhost:3000/?code=abc`)
 2. Check browser console for JavaScript errors
 3. Verify query string is in URL bar
-4. Try simple test: `http://localhost:31875?test=hello`
+4. Try simple test: `http://localhost:3000?test=hello`
 
 ### Log Locations and Formats
 
@@ -852,8 +855,8 @@ kill -9 <PID>
 **Example output:**
 
 ```text
-🚀 Server running on http://localhost:31875
-📋 OAuth Callback URL: http://localhost:31875
+🚀 Server running on http://localhost:3000
+📋 OAuth Callback URL: http://localhost:3000
 ```
 
 **Browser logs:**
@@ -867,16 +870,16 @@ kill -9 <PID>
 
 ```bash
 # Check if server is running
-lsof -i:31875
+lsof -i:3000
 
 # Check if BrowserSync is running
-lsof -i:1975
+lsof -i:3001
 
 # Test server with curl
-curl http://localhost:31875
+curl http://localhost:3000
 
 # Test with query parameters
-curl "http://localhost:31875?code=test123&state=xyz"
+curl "http://localhost:3000?code=test123&state=xyz"
 
 # Check Node.js version
 node --version
@@ -897,9 +900,9 @@ npm outdated
 
 1. Start server: `npm run dev`
 2. Check console for startup messages
-3. Visit `http://localhost:1975`
+3. Visit `http://localhost:3001`
 4. Should see "No parameters found" message
-5. Visit `http://localhost:1975?code=test`
+5. Visit `http://localhost:3001?code=test`
 6. Should see textarea with "test"
 7. Click copy button
 8. Button should change to "Copied!" briefly
@@ -909,7 +912,7 @@ npm outdated
 
 ```bash
 # Check server responds
-curl -s http://localhost:31875 | grep "OAuth Parameters"
+curl -s http://localhost:3000 | grep "OAuth Parameters"
 
 # Should output: <h1>OAuth Parameters</h1>
 ```
@@ -983,11 +986,11 @@ curl -s http://localhost:31875 | grep "OAuth Parameters"
 
 **Version 1.1 (Current)**
 
-- ✅ Express server on port 31875
+- ✅ Express server on port 3000
 - ✅ Dynamic parameter display
 - ✅ Copy buttons with icons
 - ✅ Auto-resize textareas
-- ✅ BrowserSync live reload
+- ✅ BrowserSync live reload on port 3001
 
 **Version 1.2 (Next)**
 
@@ -1087,9 +1090,9 @@ npm update           # Update dependencies
 npm outdated         # Check for outdated packages
 
 # Debugging
-lsof -i:31875        # Check if port is in use
-lsof -ti:31875 | xargs kill -9  # Kill process on port
-curl http://localhost:31875     # Test server
+lsof -i:3000        # Check if port is in use
+lsof -ti:3000 | xargs kill -9  # Kill process on port
+curl http://localhost:3000     # Test server
 
 # Git
 git status           # Check status

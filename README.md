@@ -12,7 +12,7 @@ When developing OAuth integrations, you need a local callback URL to receive aut
 
 ## ✨ Features
 
-- 🚀 **Express server** on port 31875
+- 🚀 **Express server** on port 3000
 - 📋 **Displays all query parameters** dynamically
 - 📝 **Individual copy buttons** for each parameter
 - 🎨 **Auto-sizing textareas** that fit content perfectly
@@ -30,7 +30,7 @@ npm install
 npm run dev
 
 # 3. Use as your OAuth callback URL
-# http://localhost:31875
+# http://localhost:3000
 ```
 
 That's it! The server will capture any query parameters sent to it.
@@ -40,7 +40,7 @@ That's it! The server will capture any query parameters sent to it.
 When an OAuth provider redirects to your callback URL with parameters like:
 
 ```text
-http://localhost:31875?code=abc123&state=xyz789
+http://localhost:3000?code=abc123&state=xyz789
 ```
 
 You'll see a clean interface displaying each parameter with its own copy button.
@@ -49,7 +49,7 @@ You'll see a clean interface displaying each parameter with its own copy button.
 
 ### As OAuth Callback URL
 
-Register `http://localhost:31875` as your OAuth callback URL with your provider:
+Register `http://localhost:3000` as your OAuth callback URL with your provider:
 
 - **Google OAuth:** Add to "Authorized redirect URIs"
 - **GitHub OAuth:** Add to "Authorization callback URL"
@@ -62,8 +62,8 @@ Register `http://localhost:31875` as your OAuth callback URL with your provider:
 npm run dev
 ```
 
-- Starts Express server on `http://localhost:31875`
-- Starts BrowserSync on `http://localhost:1975` (with live reload)
+- Starts Express server on `http://localhost:3000`
+- Starts BrowserSync on `http://localhost:3001` (with live reload)
 - Watches for file changes and auto-refreshes browser
 
 ### Production Mode
@@ -72,7 +72,7 @@ npm run dev
 npm start
 ```
 
-- Starts Express server only on `http://localhost:31875`
+- Starts Express server only on `http://localhost:3000`
 - No live reload (lighter weight)
 
 ## 📦 What's Included
@@ -118,10 +118,10 @@ Test the server with query parameters:
 
 ```bash
 # Test with single parameter
-open "http://localhost:31875?code=test123"
+open "http://localhost:3000?code=test123"
 
 # Test with multiple parameters
-open "http://localhost:31875?code=abc123&state=xyz789&error=none"
+open "http://localhost:3000?code=abc123&state=xyz789&error=none"
 ```
 
 ## 🐛 Troubleshooting
@@ -129,8 +129,8 @@ open "http://localhost:31875?code=abc123&state=xyz789&error=none"
 ### Port already in use
 
 ```bash
-# Kill the process using port 31875
-lsof -ti:31875 | xargs kill -9
+# Kill the process using port 3000
+lsof -ti:3000 | xargs kill -9
 ```
 
 ### CSS not updating
@@ -151,7 +151,7 @@ lsof -ti:31875 | xargs kill -9
 Edit `server.js` line 5:
 
 ```javascript
-const PORT = 31875; // Change to your preferred port
+const PORT = 3000; // Change to your preferred port
 ```
 
 Also update `package.json` line 8 to match.
@@ -176,7 +176,7 @@ MIT License - feel free to use this for any purpose.
 
 ## 💡 Tips
 
-- **Use with ngrok** for HTTPS callbacks: `ngrok http 31875`
+- **Use with ngrok** for HTTPS callbacks: `ngrok http 3000`
 - **Multiple OAuth providers?** This server works with all of them
 - **Need history?** Consider adding localStorage persistence (see roadmap)
 
