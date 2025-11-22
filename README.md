@@ -183,17 +183,8 @@ MIT License - feel free to use this for any purpose.
 ## 🗺️ Roadmap
 
 - [ ] Error handling for Clipboard API
-- [ ] HTTPS support with self-signed certificates
 - [ ] localStorage persistence for parameter history
-- [ ] TypeScript conversion
-- [ ] Automated tests
 
 ## 📚 Documentation
 
 For detailed documentation, see [`_AI_AGENT_PRIMER.md`](./_AI_AGENT_PRIMER.md) - a comprehensive guide for developers and AI agents.
-
----
-
-**Made with ❤️ for OAuth developers**
-
-_Need help? Check the [troubleshooting section](#-troubleshooting) or open an issue._

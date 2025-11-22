@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently \"node server.js\" \"browser-sync start --proxy 'localhost:31875' --port 1975 --files '**/*.html, **/*.css, **/*.js' --no-open\""
+    "dev": "concurrently \"node server.js\" \"browser-sync start --proxy 'localhost:3000' --port 3001 --files '**/*.html, **/*.css, **/*.js' --no-open\""
   },
   "keywords": [
     "oauth",
