@@ -11,14 +11,7 @@
 
 
     <div id="auth-code-container">
-        <div class="header-controls">
-            <h1>OAuth Parameters</h1>
-            <div class="view-toggle">
-                <button id="toggle-view" class="toggle-btn">
-                    <i class="fa-solid fa-eye"></i> <span id="toggle-text">Detailed View</span>
-                </button>
-            </div>
-        </div>
+        <h1>OAuth Parameters</h1>
         <div id="params-container"></div>
 
         <!-- Request Details Section -->
@@ -117,34 +110,7 @@
             copyToClipboard(value, button);
         }
 
-        // View toggle functionality
-        function initViewToggle() {
-            const toggleBtn = document.getElementById('toggle-view');
-            const toggleText = document.getElementById('toggle-text');
-            const requestDetails = document.getElementById('request-details');
 
-            // Load saved preference
-            const isDetailedView = localStorage.getItem('detailedView') === 'true';
-
-            if (isDetailedView) {
-                requestDetails.setAttribute('open', '');
-                toggleText.textContent = 'Simple View';
-            }
-
-            toggleBtn.addEventListener('click', () => {
-                const isOpen = requestDetails.hasAttribute('open');
-
-                if (isOpen) {
-                    requestDetails.removeAttribute('open');
-                    toggleText.textContent = 'Detailed View';
-                    localStorage.setItem('detailedView', 'false');
-                } else {
-                    requestDetails.setAttribute('open', '');
-                    toggleText.textContent = 'Simple View';
-                    localStorage.setItem('detailedView', 'true');
-                }
-            });
-        }
 
         // Generate cURL command from request details
         function generateCurlCommand(requestData) {
@@ -219,11 +185,13 @@
                     const curlTextarea = document.getElementById('curl-command');
                     curlTextarea.value = curlCommand;
 
-                    // Auto-resize cURL textarea
-                    setTimeout(() => {
-                        curlTextarea.style.height = '0px';
-                        curlTextarea.style.height = curlTextarea.scrollHeight + 'px';
-                    }, 0);
+                    // Auto-resize cURL textarea based on line count
+                    const lines = curlCommand.split('\n').length;
+                    const lineHeight = 18; // pixels per line (0.85em * 16px * 1.3 line-height ≈ 18px)
+                    const padding = 16; // 8px top + 8px bottom
+                    const border = 2; // 1px top + 1px bottom
+                    const newHeight = (lines * lineHeight) + padding + border;
+                    curlTextarea.style.height = newHeight + 'px';
                 }
             } catch (error) {
                 console.error('Failed to load request details:', error);
@@ -276,7 +244,6 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-            initViewToggle();
             loadRequestDetails();
         });
     </script>
