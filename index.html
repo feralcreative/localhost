@@ -11,19 +11,223 @@
 
 
     <div id="auth-code-container">
-        <h1>OAuth Parameters</h1>
+        <div class="header-controls">
+            <h1>OAuth Parameters</h1>
+            <div class="view-toggle">
+                <button id="toggle-view" class="toggle-btn">
+                    <i class="fa-solid fa-eye"></i> <span id="toggle-text">Detailed View</span>
+                </button>
+            </div>
+        </div>
         <div id="params-container"></div>
+
+        <!-- Request Details Section -->
+        <details id="request-details" class="request-details">
+            <summary>
+                <i class="fa-solid fa-circle-info"></i> Request Details
+            </summary>
+            <div class="details-content">
+                <div class="detail-section">
+                    <h3>Request Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Method:</span>
+                            <span class="info-value" id="req-method">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Protocol:</span>
+                            <span class="info-value" id="req-protocol">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Host:</span>
+                            <span class="info-value" id="req-host">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Path:</span>
+                            <span class="info-value" id="req-path">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">IP Address:</span>
+                            <span class="info-value" id="req-ip">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Timestamp:</span>
+                            <span class="info-value" id="req-timestamp">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Request Headers</h3>
+                    <div class="headers-table-wrapper">
+                        <table class="headers-table" id="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="headers-tbody">
+                                <tr>
+                                    <td colspan="3" class="no-data">No headers available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>cURL Command</h3>
+                    <div class="curl-wrapper">
+                        <textarea id="curl-command" readonly>-</textarea>
+                        <button class="copy-curl-btn" onclick="copyCurlCommand()">
+                            <i class="fa-regular fa-copy"></i> Copy cURL
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </details>
     </div>
 
     <script>
         function copyToClipboard(text, button) {
             navigator.clipboard.writeText(text).then(() => {
-                const originalText = button.textContent;
-                button.textContent = 'Copied!';
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
                 setTimeout(() => {
-                    button.textContent = originalText;
+                    button.innerHTML = originalText;
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                button.innerHTML = '<i class="fa-solid fa-xmark"></i> Failed';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
                 }, 1500);
             });
+        }
+
+        function copyCurlCommand() {
+            const curlTextarea = document.getElementById('curl-command');
+            const button = event.target.closest('button');
+            copyToClipboard(curlTextarea.value, button);
+        }
+
+        function copyHeaderValue(value, button) {
+            copyToClipboard(value, button);
+        }
+
+        // View toggle functionality
+        function initViewToggle() {
+            const toggleBtn = document.getElementById('toggle-view');
+            const toggleText = document.getElementById('toggle-text');
+            const requestDetails = document.getElementById('request-details');
+
+            // Load saved preference
+            const isDetailedView = localStorage.getItem('detailedView') === 'true';
+
+            if (isDetailedView) {
+                requestDetails.setAttribute('open', '');
+                toggleText.textContent = 'Simple View';
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                const isOpen = requestDetails.hasAttribute('open');
+
+                if (isOpen) {
+                    requestDetails.removeAttribute('open');
+                    toggleText.textContent = 'Detailed View';
+                    localStorage.setItem('detailedView', 'false');
+                } else {
+                    requestDetails.setAttribute('open', '');
+                    toggleText.textContent = 'Simple View';
+                    localStorage.setItem('detailedView', 'true');
+                }
+            });
+        }
+
+        // Generate cURL command from request details
+        function generateCurlCommand(requestData) {
+            if (!requestData || !requestData.method) {
+                return 'No request data available';
+            }
+
+            const protocol = requestData.protocol || 'http';
+            const host = requestData.host || 'localhost:3000';
+            const path = requestData.url || '/';
+            const url = `${protocol}://${host}${path}`;
+
+            let curl = `curl -X ${requestData.method} '${url}'`;
+
+            // Add headers (exclude some common ones that curl adds automatically)
+            const excludeHeaders = ['host', 'connection', 'accept-encoding'];
+            if (requestData.headers) {
+                Object.entries(requestData.headers).forEach(([key, value]) => {
+                    if (!excludeHeaders.includes(key.toLowerCase())) {
+                        curl += ` \\\n  -H '${key}: ${value}'`;
+                    }
+                });
+            }
+
+            return curl;
+        }
+
+        // Load and display request details
+        async function loadRequestDetails() {
+            try {
+                const response = await fetch('/api/request-details');
+                const data = await response.json();
+
+                if (data && data.method) {
+                    // Update request information
+                    document.getElementById('req-method').textContent = data.method || '-';
+                    document.getElementById('req-protocol').textContent = data.protocol ? data.protocol.toUpperCase() : '-';
+                    document.getElementById('req-host').textContent = data.host || '-';
+                    document.getElementById('req-path').textContent = data.path || '-';
+                    document.getElementById('req-ip').textContent = data.ip || '-';
+
+                    // Format timestamp
+                    if (data.timestamp) {
+                        const date = new Date(data.timestamp);
+                        document.getElementById('req-timestamp').textContent = date.toLocaleString();
+                    }
+
+                    // Update headers table
+                    const tbody = document.getElementById('headers-tbody');
+                    tbody.innerHTML = '';
+
+                    if (data.headers && Object.keys(data.headers).length > 0) {
+                        Object.entries(data.headers).forEach(([key, value]) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td class="header-name">${key}</td>
+                                <td class="header-value">${value}</td>
+                                <td class="header-copy">
+                                    <button onclick="copyHeaderValue('${value.replace(/'/g, "\\'")}', this)">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="3" class="no-data">No headers available</td></tr>';
+                    }
+
+                    // Generate and display cURL command
+                    const curlCommand = generateCurlCommand(data);
+                    const curlTextarea = document.getElementById('curl-command');
+                    curlTextarea.value = curlCommand;
+
+                    // Auto-resize cURL textarea
+                    setTimeout(() => {
+                        curlTextarea.style.height = '0px';
+                        curlTextarea.style.height = curlTextarea.scrollHeight + 'px';
+                    }, 0);
+                }
+            } catch (error) {
+                console.error('Failed to load request details:', error);
+            }
         }
 
         // Parse all query parameters
@@ -69,6 +273,12 @@
                 paramsContainer.appendChild(paramDiv);
             });
         }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initViewToggle();
+            loadRequestDetails();
+        });
     </script>
 
 
