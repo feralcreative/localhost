@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Provider Selection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/styles/style.min.css">
+</head>
+<body>
+    <div id="auth-code-container">
+        <h1>OAuth Provider Selection</h1>
+        <p class="subtitle">Choose an OAuth provider to connect, or use manual mode to capture any callback.</p>
+        
+        <div id="providers-container" class="providers-grid">
+            <div class="loading-message">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading providers...
+            </div>
+        </div>
+
+        <div class="manual-mode-section">
+            <h2>Manual Mode</h2>
+            <p>Use manual mode to capture OAuth parameters from any provider without automatic token exchange.</p>
+            <a href="/manual" class="manual-mode-btn">
+                <i class="fa-solid fa-hand-pointer"></i> Manual Parameter Capture
+            </a>
+        </div>
+    </div>
+
+    <script>
+        async function loadProviders() {
+            const container = document.getElementById('providers-container');
+            
+            try {
+                const response = await fetch('/api/providers');
+                const providers = await response.json();
+                
+                if (providers.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-providers">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <p>No OAuth providers configured.</p>
+                            <p class="hint">Add provider configurations to <code>oauth-configs.json</code> and set credentials in <code>.env</code></p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                providers.forEach(provider => {
+                    const card = document.createElement('div');
+                    card.className = 'provider-card';
+                    
+                    // Get icon based on provider name
+                    let icon = 'fa-plug';
+                    if (provider.name.toLowerCase().includes('github')) icon = 'fa-github';
+                    else if (provider.name.toLowerCase().includes('google')) icon = 'fa-google';
+                    else if (provider.name.toLowerCase().includes('spotify')) icon = 'fa-spotify';
+                    else if (provider.name.toLowerCase().includes('harvest')) icon = 'fa-clock';
+                    
+                    card.innerHTML = `
+                        <div class="provider-icon">
+                            <i class="fa-brands ${icon}"></i>
+                        </div>
+                        <h3>${provider.name}</h3>
+                        <p class="provider-description">${provider.description || 'OAuth authentication'}</p>
+                        <button class="connect-btn" onclick="connectProvider('${provider.id}')">
+                            <i class="fa-solid fa-arrow-right"></i> Connect
+                        </button>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+            } catch (error) {
+                console.error('Failed to load providers:', error);
+                container.innerHTML = `
+                    <div class="error-message">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p>Failed to load OAuth providers</p>
+                        <p class="hint">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function connectProvider(providerId) {
+            window.location.href = `/oauth/authorize?provider=${providerId}`;
+        }
+        
+        // Load providers on page load
+        document.addEventListener('DOMContentLoaded', loadProviders);
+    </script>
+</body>
+</html>
+

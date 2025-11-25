@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Success</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/styles/style.min.css">
+</head>
+<body>
+    <div id="auth-code-container">
+        <h1>✅ OAuth Success</h1>
+        <p class="subtitle" id="provider-name">Loading...</p>
+
+        <div id="success-content" class="success-content">
+            <div class="loading-message">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading OAuth data...
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <a href="/" class="action-btn primary">
+                <i class="fa-solid fa-home"></i> Back to Providers
+            </a>
+            <button onclick="copyAllAsJSON()" class="action-btn secondary">
+                <i class="fa-regular fa-copy"></i> Copy All as JSON
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                button.innerHTML = '<i class="fa-solid fa-xmark"></i> Failed';
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 1500);
+            });
+        }
+
+        function copyAllAsJSON() {
+            const button = event.target.closest('button');
+            if (window.oauthData) {
+                const json = JSON.stringify(window.oauthData, null, 2);
+                copyToClipboard(json, button);
+            }
+        }
+
+        function createTokenDisplay(label, value, sensitive = false) {
+            const div = document.createElement('div');
+            div.className = 'token-item';
+
+            const labelEl = document.createElement('label');
+            labelEl.textContent = label;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'field-wrapper';
+
+            const textarea = document.createElement('textarea');
+            textarea.value = value || 'N/A';
+            textarea.readOnly = true;
+            textarea.rows = 1;
+
+            if (sensitive) {
+                textarea.className = 'sensitive';
+            }
+
+            // Auto-resize
+            setTimeout(() => {
+                textarea.style.height = '0px';
+                const newHeight = textarea.scrollHeight;
+                textarea.style.height = newHeight + 'px';
+            }, 0);
+
+            const button = document.createElement('button');
+            button.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            button.onclick = () => copyToClipboard(value, button);
+
+            wrapper.appendChild(textarea);
+            wrapper.appendChild(button);
+            div.appendChild(labelEl);
+            div.appendChild(wrapper);
+
+            return div;
+        }
+
+        async function loadOAuthResult() {
+            try {
+                const response = await fetch('/api/oauth-result');
+                const data = await response.json();
+
+                window.oauthData = data;
+
+                if (!data || !data.provider) {
+                    document.getElementById('success-content').innerHTML = `
+                        <div class="error-message">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <p>No OAuth data found</p>
+                            <p class="hint">The session may have expired</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                document.getElementById('provider-name').textContent =
+                    `Successfully connected to ${data.provider}`;
+
+                const container = document.getElementById('success-content');
+                container.innerHTML = '';
+
+                // Tokens Section
+                const tokensSection = document.createElement('div');
+                tokensSection.className = 'data-section';
+                tokensSection.innerHTML = '<h2><i class="fa-solid fa-key"></i> Access Tokens</h2>';
+
+                if (data.tokens) {
+                    if (data.tokens.access_token) {
+                        tokensSection.appendChild(createTokenDisplay('Access Token', data.tokens.access_token, true));
+                    }
+                    if (data.tokens.refresh_token) {
+                        tokensSection.appendChild(createTokenDisplay('Refresh Token', data.tokens.refresh_token, true));
+                    }
+                    if (data.tokens.token_type) {
+                        tokensSection.appendChild(createTokenDisplay('Token Type', data.tokens.token_type));
+                    }
+                    if (data.tokens.expires_in) {
+                        const expiresAt = new Date(Date.now() + data.tokens.expires_in * 1000);
+                        tokensSection.appendChild(createTokenDisplay('Expires In',
+                            `${data.tokens.expires_in} seconds (${expiresAt.toLocaleString()})`));
+                    }
+                }
+
+                container.appendChild(tokensSection);
+
+                // Company Info Section (for Harvest)
+                if (data.companyInfo) {
+                    const companySection = document.createElement('div');
+                    companySection.className = 'data-section';
+                    companySection.innerHTML = '<h2><i class="fa-solid fa-building"></i> Company Information</h2>';
+                    companySection.appendChild(createTokenDisplay('Account Name', data.companyInfo.name));
+                    companySection.appendChild(createTokenDisplay('Account ID', data.companyInfo.id.toString()));
+                    if (data.companyInfo.base_uri) {
+                        companySection.appendChild(createTokenDisplay('Base URI', data.companyInfo.base_uri));
+                    }
+                    container.appendChild(companySection);
+                }
+
+                // User Info Section
+                if (data.userInfo) {
+                    const userSection = document.createElement('div');
+                    userSection.className = 'data-section';
+                    userSection.innerHTML = '<h2><i class="fa-solid fa-user"></i> User Information</h2>';
+                    userSection.appendChild(createTokenDisplay('User Data (JSON)',
+                        JSON.stringify(data.userInfo, null, 2)));
+                    container.appendChild(userSection);
+                }
+
+                // Post-Exchange Result Section
+                if (data.postExchangeResult) {
+                    const postSection = document.createElement('div');
+                    postSection.className = 'data-section';
+                    postSection.innerHTML = '<h2><i class="fa-solid fa-check-circle"></i> Storage Result</h2>';
+                    postSection.appendChild(createTokenDisplay('Result (JSON)',
+                        JSON.stringify(data.postExchangeResult, null, 2)));
+                    container.appendChild(postSection);
+                }
+
+            } catch (error) {
+                console.error('Failed to load OAuth result:', error);
+                document.getElementById('success-content').innerHTML = `
+                    <div class="error-message">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p>Failed to load OAuth data</p>
+                        <p class="hint">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadOAuthResult);
+    </script>
+</body>
+</html>

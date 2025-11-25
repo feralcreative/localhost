@@ -1,0 +1,40 @@
+{
+  "provider": "Harvest (Agency Account)",
+  "providerId": "harvest-agency",
+  "tokens": {
+    "access_token": "2247940.at.PZePBzAjKTUxy613jTPzCbDitcDTMhDV8_x22XKjTjZPBL3nSfJdl3o83M2IuPAFVIHPcKHn6vyTqp3Pl5utYg",
+    "refresh_token": "2247940.rt.hRPgzfogoJtXnoPWq-YL1QdjwR-_b2aUEuFncI3Jv1iCjVk4AzSKmVIhLZa64iKhdDcDJp-pSW4vNjmJ_yATWQ",
+    "token_type": "bearer",
+    "expires_in": 1209599
+  },
+  "userInfo": null,
+  "companyInfo": {
+    "base_uri": "https://feralcreative.harvestapp.com",
+    "full_domain": "feralcreative.harvestapp.com",
+    "name": "Feral Creative",
+    "is_active": true,
+    "week_start_day": "Sunday",
+    "wants_timestamp_timers": false,
+    "time_format": "hours_minutes",
+    "date_format": "%Y-%m-%d",
+    "plan_type": "simple-v4",
+    "expense_feature": true,
+    "invoice_feature": true,
+    "estimate_feature": true,
+    "team_feature": true,
+    "weekly_capacity": 216000,
+    "approval_feature": false,
+    "clock": "24h",
+    "currency": "USD",
+    "currency_code_display": "iso_code_none",
+    "currency_symbol_display": "symbol_before",
+    "decimal_symbol": ".",
+    "thousands_separator": ",",
+    "color_scheme": "purple",
+    "saml_sign_in_required": false,
+    "day_entry_notes_required": false
+  },
+  "postExchangeResult": {
+    "success": true
+  }
+}

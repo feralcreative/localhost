@@ -1,0 +1,75 @@
+{
+  "harvest-agency": {
+    "name": "Harvest (Agency - Cannonball)",
+    "description": "Connect to Harvest time tracking for agency account",
+    "authEndpoint": "https://id.getharvest.com/oauth2/authorize",
+    "tokenEndpoint": "https://id.getharvest.com/api/v2/oauth2/token",
+    "companyInfoEndpoint": "https://api.harvestapp.com/v2/company",
+    "clientId": "${HARVEST_CLIENT_ID}",
+    "clientSecret": "${HARVEST_CLIENT_SECRET}",
+    "redirectUri": "http://localhost:3000/oauth/callback",
+    "scopes": [],
+    "responseType": "code",
+    "grantType": "authorization_code",
+    "headers": {
+      "User-Agent": "HarvestSync (ziad@feralcreative.co)"
+    },
+    "postExchange": {
+      "enabled": true,
+      "type": "firebase-function",
+      "url": "${FIREBASE_FUNCTION_URL}",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "mapping": {
+        "userId": "${FIREBASE_USER_ID}",
+        "account": "agency",
+        "access_token": "{{tokens.access_token}}",
+        "refresh_token": "{{tokens.refresh_token}}",
+        "expires_in": "{{tokens.expires_in}}",
+        "account_id": "${HARVEST_ACCOUNT_ID_AGENCY}",
+        "account_name": "${HARVEST_ACCOUNT_NAME_AGENCY}"
+      }
+    }
+  },
+  "github": {
+    "name": "GitHub",
+    "description": "Connect to GitHub for repository access",
+    "authEndpoint": "https://github.com/login/oauth/authorize",
+    "tokenEndpoint": "https://github.com/login/oauth/access_token",
+    "clientId": "${GITHUB_CLIENT_ID}",
+    "clientSecret": "${GITHUB_CLIENT_SECRET}",
+    "redirectUri": "http://localhost:3000/oauth/callback",
+    "scopes": ["repo", "user"],
+    "responseType": "code",
+    "grantType": "authorization_code",
+    "headers": {
+      "Accept": "application/json"
+    }
+  },
+  "google": {
+    "name": "Google",
+    "description": "Connect to Google services",
+    "authEndpoint": "https://accounts.google.com/o/oauth2/v2/auth",
+    "tokenEndpoint": "https://oauth2.googleapis.com/token",
+    "clientId": "${GOOGLE_CLIENT_ID}",
+    "clientSecret": "${GOOGLE_CLIENT_SECRET}",
+    "redirectUri": "http://localhost:3000/oauth/callback",
+    "scopes": ["openid", "email", "profile"],
+    "responseType": "code",
+    "grantType": "authorization_code"
+  },
+  "spotify": {
+    "name": "Spotify",
+    "description": "Connect to Spotify for music data",
+    "authEndpoint": "https://accounts.spotify.com/authorize",
+    "tokenEndpoint": "https://accounts.spotify.com/api/token",
+    "clientId": "${SPOTIFY_CLIENT_ID}",
+    "clientSecret": "${SPOTIFY_CLIENT_SECRET}",
+    "redirectUri": "http://localhost:3000/oauth/callback",
+    "scopes": ["user-read-private", "user-read-email"],
+    "responseType": "code",
+    "grantType": "authorization_code"
+  }
+}
