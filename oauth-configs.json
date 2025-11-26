@@ -1,6 +1,6 @@
 {
   "harvest-agency": {
-    "name": "Harvest (Agency - Cannonball)",
+    "name": "Harvest",
     "description": "Connect to Harvest time tracking for agency account",
     "authEndpoint": "https://id.getharvest.com/oauth2/authorize",
     "tokenEndpoint": "https://id.getharvest.com/api/v2/oauth2/token",
@@ -12,10 +12,10 @@
     "responseType": "code",
     "grantType": "authorization_code",
     "headers": {
-      "User-Agent": "HarvestSync (ziad@feralcreative.co)"
+      "User-Agent": "HarvestSync (ziad@cannonballcreative.agency)"
     },
     "postExchange": {
-      "enabled": true,
+      "enabled": false,
       "type": "firebase-function",
       "url": "${FIREBASE_FUNCTION_URL}",
       "method": "POST",

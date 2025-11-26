@@ -11,7 +11,7 @@
     <div id="auth-code-container">
         <h1>OAuth Provider Selection</h1>
         <p class="subtitle">Choose an OAuth provider to connect, or use manual mode to capture any callback.</p>
-        
+
         <div id="providers-container" class="providers-grid">
             <div class="loading-message">
                 <i class="fa-solid fa-spinner fa-spin"></i> Loading providers...
@@ -30,11 +30,11 @@
     <script>
         async function loadProviders() {
             const container = document.getElementById('providers-container');
-            
+
             try {
                 const response = await fetch('/api/providers');
                 const providers = await response.json();
-                
+
                 if (providers.length === 0) {
                     container.innerHTML = `
                         <div class="no-providers">
@@ -45,23 +45,37 @@
                     `;
                     return;
                 }
-                
+
                 container.innerHTML = '';
-                
-                providers.forEach(provider => {
+
+                // Filter out Spotify and sort providers
+                const providerOrder = ['google', 'github', 'harvest'];
+                const filteredProviders = providers
+                    .filter(p => !p.name.toLowerCase().includes('spotify'))
+                    .sort((a, b) => {
+                        const aIndex = providerOrder.findIndex(name => a.name.toLowerCase().includes(name));
+                        const bIndex = providerOrder.findIndex(name => b.name.toLowerCase().includes(name));
+                        return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+                    });
+
+                filteredProviders.forEach(provider => {
                     const card = document.createElement('div');
                     card.className = 'provider-card';
-                    
+
                     // Get icon based on provider name
                     let icon = 'fa-plug';
+                    let iconType = 'fa-brands';
                     if (provider.name.toLowerCase().includes('github')) icon = 'fa-github';
                     else if (provider.name.toLowerCase().includes('google')) icon = 'fa-google';
                     else if (provider.name.toLowerCase().includes('spotify')) icon = 'fa-spotify';
-                    else if (provider.name.toLowerCase().includes('harvest')) icon = 'fa-clock';
-                    
+                    else if (provider.name.toLowerCase().includes('harvest')) {
+                        icon = 'fa-wheat-awn';
+                        iconType = 'fa-solid';
+                    }
+
                     card.innerHTML = `
                         <div class="provider-icon">
-                            <i class="fa-brands ${icon}"></i>
+                            <i class="${iconType} ${icon}"></i>
                         </div>
                         <h3>${provider.name}</h3>
                         <p class="provider-description">${provider.description || 'OAuth authentication'}</p>
@@ -69,10 +83,10 @@
                             <i class="fa-solid fa-arrow-right"></i> Connect
                         </button>
                     `;
-                    
+
                     container.appendChild(card);
                 });
-                
+
             } catch (error) {
                 console.error('Failed to load providers:', error);
                 container.innerHTML = `
@@ -84,14 +98,13 @@
                 `;
             }
         }
-        
+
         function connectProvider(providerId) {
             window.location.href = `/oauth/authorize?provider=${providerId}`;
         }
-        
+
         // Load providers on page load
         document.addEventListener('DOMContentLoaded', loadProviders);
     </script>
 </body>
 </html>
-
